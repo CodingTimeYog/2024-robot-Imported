@@ -1,0 +1,50 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.55,
+      "y": 6.801215072239467
+    },
+    "rotation": 64.29598908163406
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Topmost Starting Position To Left Amp"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot_note"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Amp to Left Mid Note"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "move_arm_down"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
