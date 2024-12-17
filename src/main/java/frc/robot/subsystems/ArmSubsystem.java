@@ -1,21 +1,22 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.*;
-import com.revrobotics.jni.CANSparkJNI;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
-import com.revrobotics.spark.SparkLowLevel.PeriodicFrame;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.TimeUnit;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.*;
-import edu.wpi.first.units.measure.Velocity;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
@@ -52,22 +53,21 @@ public class ArmSubsystem extends SubsystemBase {
     mLeftMotor = new SparkMax(Constants.ARM_LEFT_MOTOR_ID, MotorType.kBrushless);
     mRightMotor = new SparkMax(Constants.ARM_RIGHT_MOTOR_ID, MotorType.kBrushless);
 
-    mRightMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
-    mRightMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
+    // mRightMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 20);
+    // mRightMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 20);
 
-    mRightMotor.setPeriodicFrameTimeout(20);
+    SparkMaxConfig config = new SparkMaxConfig();
 
-    mEncoder = mRightMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
-    mEncoder.setAverageDepth(64);
-    mEncoder.setZeroOffset(Constants.ARM_LOWER_POSITION_ABSOLUTE_ENCODER_OFFSET.in(Units.Rotation));
-
-    mLeftMotor.setIdleMode(IdleMode.kBrake);
-    mRightMotor.setIdleMode(IdleMode.kBrake);
-
+    config.signals.primaryEncoderPositionPeriodMs(5);
+    config.absoluteEncoder.averageDepth(64);
+    config.absoluteEncoder.zeroOffset(Constants.ARM_LOWER_POSITION_ABSOLUTE_ENCODER_OFFSET.in(Units.Rotation));
+    config.idleMode(IdleMode.kBrake);
+    // mLeftMotor.setIdleMode(IdleMode.kBrake);
+    // mRightMotor.setIdleMode(IdleMode.kBrake);
     var stepRate = Units.Volts.of(1).per(Units.Second.of(1.0));
     var stepVoltage = Units.Volts.of(4);
     var timeout = Units.Seconds.of(60);
-
+    
     mSysIdRoutine =
         new SysIdRoutine(
             new SysIdRoutine.Config(stepRate, stepVoltage, timeout),
@@ -105,6 +105,8 @@ public class ArmSubsystem extends SubsystemBase {
     tab.addBoolean("At Top", this::atTop);
     tab.add("Top Limit Switch", mLimitSwitchTop);
     tab.add("PID Controller", mPidController);
+
+    mLeftMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   public double getValue() {
