@@ -4,17 +4,22 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
+
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class ShooterSubsystem extends SubsystemBase {
 
-  private final CANSparkMax mLeftMotor;
-  private final CANSparkMax mRightMotor;
+  private final SparkMax mLeftMotor;
+  private final SparkMax mRightMotor;
 
   private final RelativeEncoder mLeftEncoder;
   private final RelativeEncoder mRightEncoder;
@@ -23,17 +28,27 @@ public class ShooterSubsystem extends SubsystemBase {
 
   /** Creates a new ShooterSubsystem. */
   public ShooterSubsystem() {
-    mLeftMotor = new CANSparkMax(Constants.SHOOTER_MOTOR_LEFT, MotorType.kBrushless);
-    mRightMotor = new CANSparkMax(Constants.SHOOTER_MOTOR_RIGHT, MotorType.kBrushless);
+    mLeftMotor = new SparkMax(Constants.SHOOTER_MOTOR_LEFT, MotorType.kBrushless);
+    mRightMotor = new SparkMax(Constants.SHOOTER_MOTOR_RIGHT, MotorType.kBrushless);
+    
+    // Setting Config for things like motor following, current limit,
+    // and motor mode. 
+    SparkMaxConfig globalConfig = new SparkMaxConfig();
 
-    mLeftMotor.restoreFactoryDefaults();
-    mRightMotor.restoreFactoryDefaults();
+    globalConfig
+      .smartCurrentLimit(50)
+      .idleMode(IdleMode.kBrake);
+    
+    SparkMaxConfig leftConfig = new SparkMaxConfig();
+    leftConfig.apply(globalConfig).follow(mRightMotor);
+    mRightMotor.configure(globalConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    mLeftMotor.configure(leftConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+
 
     mLeftEncoder = mLeftMotor.getEncoder();
     mRightEncoder = mRightMotor.getEncoder();
 
-    // Sets left to follow the right, allows us to have same speed on both
-    mLeftMotor.follow(mRightMotor);
 
     Shuffleboard.getTab("Arm").addNumber("Flywheel Speed (RPM)", mLeftEncoder::getVelocity);
   }
