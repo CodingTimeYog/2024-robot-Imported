@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.config.PIDConstants;
+
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -68,13 +70,13 @@ public final class Constants {
   public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 15;
   public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(5.800781);
 
-//   public static final HolonomicPathFollowerConfig PATH_FOLLOWER_CONFIG =
-//       new HolonomicPathFollowerConfig(
-//           new PIDConstants(5.1275, 0.755),
-//           new PIDConstants(1.985),
-//           5.0,
-//           DRIVETRAIN_WHEELBASE_METERS,
-//           new ReplanningConfig());
+  public static final HolonomicPathFollowerConfig PATH_FOLLOWER_CONFIG =
+      new HolonomicPathFollowerConfig(
+          new PIDConstants(5.1275, 0.755),
+          new PIDConstants(1.985),
+          5.0,
+          DRIVETRAIN_WHEELBASE_METERS,
+          new ReplanningConfig());
 
   //
   // Shooter Motor Constants
