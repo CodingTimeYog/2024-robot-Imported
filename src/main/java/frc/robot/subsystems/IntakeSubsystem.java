@@ -4,14 +4,16 @@
 
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.measure.MutableMeasure.mutable;
 import static edu.wpi.first.units.Units.Volts;
 
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import edu.wpi.first.units.measure.MutableMeasure;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkMax;
+
+import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -19,19 +21,19 @@ public class IntakeSubsystem extends SubsystemBase {
 
   private RelativeEncoder mIntakeEncoder;
 
-  private final CANSparkMax mIntakeMotor;
+  private final SparkMax mIntakeMotor;
 
   private double mDesiredIntakeSpeed = 0.0;
 
   // SysID:
-  private final MutableVoltage mAppliedIntakeVoltage = mutable(Volts.of(0));
-  private final MutableVoltage mAppliedLoaderVoltage = mutable(Volts.of(0));
+  private final MutVoltage mAppliedIntakeVoltage = (MutVoltage) (Volts.of(0));
+  private final MutVoltage mAppliedLoaderVoltage = (MutVoltage) Volts.of(0);
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem() {
-    mIntakeMotor = new CANSparkMax(Constants.INTAKE_MOTOR_CAN_ID, MotorType.kBrushless);
-    mIntakeMotor.restoreFactoryDefaults();
-    mIntakeMotor.setInverted(true);
+    mIntakeMotor = new SparkMax(Constants.INTAKE_MOTOR_CAN_ID, MotorType.kBrushless);
+    SparkMaxConfig mIntakeConfig = new SparkMaxConfig();
+    mIntakeConfig.inverted(true);
 
     mIntakeEncoder = mIntakeMotor.getEncoder();
   }
